@@ -1,7 +1,7 @@
 import { createServer } from 'http';
 
 const hostname = process.env.HOSTNAME || '127.0.0.1';
-const port = parseInt(process.env.PORT, 10) || 5000;
+const port = parseInt(process.env.PORT!, 10) || 5000;
 
 const server = createServer((req, res) => {
   res.statusCode = 200;
