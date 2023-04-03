@@ -20,7 +20,7 @@ app.get('/', async (req, res) => {
     sql: "SELECT 1",
   };
   const [rows] = await database.run(query);
-  res.send(`Hello from App Engine! ${rows[0]}`);
+  res.send(`Hello from App Engine! ${JSON.stringify(rows[0])}`);
 });
 
 app.post('/accounts', async (req, res) => {
