@@ -35,7 +35,7 @@ app.post('/accounts', async (req, res) => {
   const aggregateId = "your-aggregate-id-generation-logic";
   const eventType = "AccountCreated";
   const eventData = JSON.stringify({ name });
-  const createdAt = new Date().toISOString();
+  const createdAt = new Date().valueOf();
 
   await database.run({
     sql: `
