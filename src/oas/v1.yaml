@@ -1,0 +1,29 @@
+openapi: 3.0.0
+info:
+  title: Account API
+  version: 1.0.0
+paths:
+  /accounts:
+    post:
+      summary: Create a new account
+      operationId: createAccount
+      requestBody:
+        description: Account information
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        201:
+          description: Account created successfully
+        400:
+          description: Invalid input data
