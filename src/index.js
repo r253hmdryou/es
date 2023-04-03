@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const {Spanner} = require('@google-cloud/spanner');
-import { handleAccountCreated } from "./eventHandlers";
+const {handleAccountCreated} = require('./eventHandlers');
+
 const app = express();
 
 const spanner = new Spanner();
