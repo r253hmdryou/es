@@ -1,9 +1,9 @@
-import http from 'node:http';
+import { createServer } from 'http';
 
-const hostname = '127.0.0.1';
-const port = 5000;
+const hostname = process.env.HOSTNAME || '127.0.0.1';
+const port = parseInt(process.env.PORT, 10) || 5000;
 
-const server = http.createServer((req, res) => {
+const server = createServer((req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
   res.end('Hello, World!\n');
