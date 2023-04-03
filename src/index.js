@@ -15,8 +15,12 @@ const database = instance.database('events');
 
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello from App Engine!');
+app.get('/', async (req, res) => {
+  const query = {
+    sql: "SELECT 1",
+  };
+  const [rows] = await database.run(query);
+  res.send(`Hello from App Engine! ${rows[0]}`);
 });
 
 app.post('/accounts', async (req, res) => {
