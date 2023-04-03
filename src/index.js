@@ -46,7 +46,7 @@ app.post('/accounts', async (req, res) => {
   });
 
   // Call the event handler
-  await handleAccountCreated(JSON.parse(eventData));
+  // await handleAccountCreated(JSON.parse(eventData));
 
   res.status(201).send({ id: aggregateId, name });
 })
