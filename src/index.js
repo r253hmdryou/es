@@ -1,11 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const {Spanner} = require('@google-cloud/spanner');
-
-function handleAccountCreated(event) {
-  // Implement your business logic here
-  console.log(`Account created: ${event.id} with name ${event.name}`);
-}
+const {v4} = require('uuid');
 
 const app = express();
 
@@ -27,8 +23,8 @@ app.post('/accounts', async (req, res) => {
   }
 
   // Create and save the event
-  const eventId = "your-event-id-generation-logic";
-  const aggregateId = "your-aggregate-id-generation-logic";
+  const eventId = v4();
+  const aggregateId = v4();
   const eventType = "AccountCreated";
   const eventData = JSON.stringify({ name });
   const createdAt = new Date().toISOString();
@@ -40,7 +36,7 @@ app.post('/accounts', async (req, res) => {
         return;
       }
 
-      const rowCount = await transaction.runUpdate({
+      const rowCount = await transaction.run({
         sql: `
           INSERT INTO event_store (id, aggregate_id, type, data, created_at)
           VALUES (@id, @aggregateId, @type, @data, @createdAt)
@@ -52,13 +48,8 @@ app.post('/accounts', async (req, res) => {
       return rowCount;
     });
 
-    if (rowCount > 0) {
-      // Call the event handler
-      await handleAccountCreated(JSON.parse(eventData));
-      res.status(201).send({ id: aggregateId, name });
-    } else {
-      res.status(500).send('Error occurred while saving the event');
-    }
+    // Call the event handler
+    res.status(201).send({ id: aggregateId, name });
   } catch (err) {
     console.error('Error while executing transaction:', err);
     res.status(500).send('Error occurred while saving the event');
