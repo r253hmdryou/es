@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const {PubSub} = require('@google-cloud/pubsub');
 
 const pubsub = new PubSub();
-const topicName = "account-created";
+const topicName = "projects/eventsourcing-sl/topics/account-created";
 
 const app = express();
 app.use(bodyParser.json());
