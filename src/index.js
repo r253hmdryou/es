@@ -1,20 +1,16 @@
+// @ts-check
 const express = require('express');
 const bodyParser = require('body-parser');
-const {Spanner} = require('@google-cloud/spanner');
-const {v4} = require('uuid');
+const {PubSub} = require('@google-cloud/pubsub');
+
+const pubsub = new PubSub();
+const topicName = "account-created";
 
 const app = express();
-
-const spanner = new Spanner();
-const instance = spanner.instance('eventstore');
-const database = instance.database('events');
-
 app.use(bodyParser.json());
-
 app.get('/', async (req, res) => {
   res.send(`Hello from App Engine!`);
 });
-
 app.post('/accounts', async (req, res) => {
   const {name} = req.body;
   if(!name) {
@@ -22,34 +18,19 @@ app.post('/accounts', async (req, res) => {
     return;
   }
 
-  // Create and save the event
-  const eventId = v4();
-  const aggregateId = v4();
-  const eventType = "AccountCreated";
-  const eventData = JSON.stringify({ name });
-  const createdAt = new Date().toISOString();
+  const message = {
+    type: "AccountCreated",
+    data: { name }
+  }
+  const data = Buffer.from(JSON.stringify(message));
 
   try {
-    const [rowCount] = await database.runTransaction(async (err, transaction) => {
-      if (err || !transaction) {
-        console.error('Error while starting transaction:', err);
-        return;
-      }
-
-      const rowCount = await transaction.run({
-        sql: `
-          INSERT INTO event_store (id, aggregate_id, type, data, created_at)
-          VALUES (@id, @aggregateId, @type, @data, @createdAt)
-        `,
-        params: { id: eventId, aggregateId, type: eventType, data: eventData, createdAt },
-      });
-
-      await transaction.commit();
-      return rowCount;
+    const messageId = await pubsub.topic(topicName).publishMessage({data}, (err, messageId) => {
+      console.log({err, messageId});
     });
 
     // Call the event handler
-    res.status(201).send({ id: aggregateId, name });
+    res.status(201).send({ id: messageId, name });
   } catch (err) {
     console.error('Error while executing transaction:', err);
     res.status(500).send('Error occurred while saving the event');
